@@ -1,4 +1,50 @@
-https://github.com/modofastboot/tareas-cdlbody.dark-mode .stat-number {
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrador de Tareas - Sergio @ Cdl</title>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#00bcd4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tareas Cdl">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  transition: background 0.3s ease;
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #0a4f5c 0%, #3d0e52 100%);
+}
+
+body.dark-mode .header,
+body.dark-mode .input-section,
+body.dark-mode .urgency-category,
+body.dark-mode .stat-card {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode .task-title,
+body.dark-mode .stat-number {
   color: #e0e0e0;
 }
 
@@ -469,7 +515,7 @@ let currentFilter = 'all'; // Track current filter state
 // ============================================
 // CONFIGURACIÓN - Pegá acá tu URL del Apps Script
 // ============================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhpWrfIpF3lxDsK-TDVq8USWtx0KEATyhs6TAwekOqT6rD6cX0xI7OMmp4Mu9Gu4SPAQ/exec';
+const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
 // ============================================
 
 // Función para filtrar tareas
