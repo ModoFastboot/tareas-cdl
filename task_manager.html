@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrador de Tareas - Sergio @ Cdl</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  transition: background 0.3s ease;
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #0a4f5c 0%, #3d0e52 100%);
+}
+
+body.dark-mode .header,
+body.dark-mode .input-section,
+body.dark-mode .urgency-category,
+body.dark-mode .stat-card {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode .task-title,
+body.dark-mode .stat-number {
+  color: #e0e0e0;
+}
+
+body.dark-mode .header p,
+body.dark-mode .form-group label,
+body.dark-mode .task-date,
+body.dark-mode .stat-label {
+  color: #b0b0b0;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #e0e0e0;
+}
+
+body.dark-mode .task-item {
+  background: #2a2a2a;
+}
+
+body.dark-mode .task-item:hover {
+  background: #333333;
+}
+
+body.dark-mode .empty-state {
+  color: #707070;
+}
+
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: white;
+  border: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.3s;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+body.dark-mode .theme-toggle {
+  background: #2a2a2a;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 28px;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.header p {
+  color: #718096;
+  font-size: 14px;
+}
+
+.input-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: #00bcd4;
+}
+
+.btn {
+  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.tasks-section {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.urgency-category {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+}
+
+.urgency-category h2 {
+  font-size: 20px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.urgency-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.urgency-urgent {
+  background: #fee;
+  color: #c53030;
+  border-left: 4px solid #c53030;
+}
+
+.urgency-important {
+  background: #fef5e7;
+  color: #d97706;
+  border-left: 4px solid #d97706;
+}
+
+.urgency-normal {
+  background: #e6f2ff;
+  color: #2b6cb0;
+  border-left: 4px solid #2b6cb0;
+}
+
+.urgency-low {
+  background: #f0f4f8;
+  color: #718096;
+  border-left: 4px solid #718096;
+}
+
+.task-item {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.task-item:hover {
+  background: #edf2f7;
+  transform: translateX(4px);
+}
+
+.task-content {
+  flex: 1;
+}
+
+.task-title {
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.task-date {
+  font-size: 13px;
+  color: #718096;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-complete, .btn-delete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-complete {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-complete:hover {
+  background: #38a169;
+}
+
+.btn-delete {
+  background: #f56565;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #e53e3e;
+}
+
+.task-completed {
+  opacity: 0.6;
+}
+
+.task-completed .task-title {
+  text-decoration: line-through;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+      <div style="width: 48px; height: 48px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 2px;">
+        <div style="background: transparent;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #7b1fa2; border-radius: 2px;"></div>
+        <div style="background: transparent;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #7b1fa2; border-radius: 2px;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #7b1fa2; border-radius: 2px;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #7b1fa2; border-radius: 2px;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: transparent;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: #00bcd4; border-radius: 2px;"></div>
+        <div style="background: transparent;"></div>
+      </div>
+      <h1 style="flex: 1;">Administrador de Tareas</h1>
+      <button onclick="refreshTasks()" style="background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
+        🔄 Refrescar
+      </button>
+    </div>
+    <p>Sergio @ Cdl</p>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat-card">
+      <div class="stat-number" id="totalTasks">0</div>
+      <div class="stat-label">Total de Tareas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="pendingTasks">0</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="completedTasks">0</div>
+      <div class="stat-label">Completadas</div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <form id="taskForm">
+      <div class="form-group">
+        <label for="taskTitle">Título de la tarea</label>
+        <input type="text" id="taskTitle" placeholder="Ej: Llamar a cliente..." required>
+      </div>
+      
+      <div class="form-group">
+        <label for="taskUrgency">Nivel de urgencia</label>
+        <select id="taskUrgency" required>
+          <option value="urgent">🔴 Urgente - Requiere atención inmediata</option>
+          <option value="important">🟠 Importante - Prioridad alta</option>
+          <option value="normal" selected>🔵 Normal - Prioridad media</option>
+          <option value="low">⚪ Baja - Puede esperar</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">+ Agregar Tarea</button>
+    </form>
+  </div>
+
+  <div class="tasks-section">
+    <div class="urgency-category">
+      <h2><span class="urgency-badge urgency-urgent">🔴 Urgente</span></h2>
+      <div id="urgentTasks" class="task-list"></div>
+    </div>
+
+    <div class="urgency-category">
+      <h2><span class="urgency-badge urgency-important">🟠 Importante</span></h2>
+      <div id="importantTasks" class="task-list"></div>
+    </div>
+
+    <div class="urgency-category">
+      <h2><span class="urgency-badge urgency-normal">🔵 Normal</span></h2>
+      <div id="normalTasks" class="task-list"></div>
+    </div>
+
+    <div class="urgency-category">
+      <h2><span class="urgency-badge urgency-low">⚪ Baja</span></h2>
+      <div id="lowTasks" class="task-list"></div>
+    </div>
+  </div>
+</div>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+  <span id="themeIcon">🌙</span>
+</button>
+
+<script>
+let tasks = [];
+let isLoading = true;
+let darkMode = false;
+
+// ============================================
+// CONFIGURACIÓN - Pegá acá tu URL del Apps Script
+// ============================================
+const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
+// ============================================
+
+// Cargar tema desde localStorage
+function loadTheme() {
+  const saved = localStorage.getItem('cdl_theme_sergio');
+  if (saved) {
+    darkMode = JSON.parse(saved);
+    applyTheme();
+  }
+}
+
+// Guardar tema
+function saveTheme() {
+  localStorage.setItem('cdl_theme_sergio', JSON.stringify(darkMode));
+}
+
+// Aplicar tema
+function applyTheme() {
+  const themeIcon = document.getElementById('themeIcon');
+  if (darkMode) {
+    document.body.classList.add('dark-mode');
+    themeIcon.textContent = '☀️';
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeIcon.textContent = '🌙';
+  }
+}
+
+// Toggle tema
+document.getElementById('themeToggle').addEventListener('click', function() {
+  darkMode = !darkMode;
+  applyTheme();
+  saveTheme();
+});
+
+// Cargar tareas desde Google Sheets
+async function loadTasks() {
+  if (!SCRIPT_URL || SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
+    alert('Por favor configurá la URL del Apps Script en el código');
+    return;
+  }
+  
+  try {
+    const response = await fetch(SCRIPT_URL + '?action=get');
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      tasks = data.tasks || [];
+    }
+  } catch (error) {
+    console.error('Error al cargar tareas:', error);
+    alert('Error al conectar con Google Sheets. Verificá tu conexión.');
+  }
+  
+  isLoading = false;
+  renderTasks();
+}
+
+// Guardar tareas en Google Sheets
+async function saveTasks() {
+  if (!SCRIPT_URL || SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
+    return;
+  }
+  
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'save', tasks: tasks })
+    });
+    
+    const data = await response.json();
+    
+    if (data.status !== 'success') {
+      throw new Error('Error al guardar');
+    }
+  } catch (error) {
+    console.error('Error al guardar tareas:', error);
+    alert('Hubo un problema al guardar la tarea. Por favor intentá de nuevo.');
+  }
+}
+
+// Agregar nueva tarea
+document.getElementById('taskForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const title = document.getElementById('taskTitle').value;
+  const urgency = document.getElementById('taskUrgency').value;
+  
+  const task = {
+    id: Date.now(),
+    title: title,
+    urgency: urgency,
+    completed: false,
+    createdAt: new Date().toLocaleString('es-AR')
+  };
+  
+  tasks.push(task);
+  await saveTasks();
+  renderTasks();
+  
+  // Limpiar formulario
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskUrgency').value = 'normal';
+});
+
+// Renderizar todas las tareas
+function renderTasks() {
+  // Limpiar todas las categorías
+  document.getElementById('urgentTasks').innerHTML = '';
+  document.getElementById('importantTasks').innerHTML = '';
+  document.getElementById('normalTasks').innerHTML = '';
+  document.getElementById('lowTasks').innerHTML = '';
+  
+  // Separar tareas por urgencia
+  const urgent = tasks.filter(t => t.urgency === 'urgent');
+  const important = tasks.filter(t => t.urgency === 'important');
+  const normal = tasks.filter(t => t.urgency === 'normal');
+  const low = tasks.filter(t => t.urgency === 'low');
+  
+  // Renderizar cada categoría
+  renderCategory('urgentTasks', urgent);
+  renderCategory('importantTasks', important);
+  renderCategory('normalTasks', normal);
+  renderCategory('lowTasks', low);
+  
+  // Actualizar estadísticas
+  updateStats();
+}
+
+// Renderizar una categoría específica
+function renderCategory(containerId, categoryTasks) {
+  const container = document.getElementById(containerId);
+  
+  if (categoryTasks.length === 0) {
+    container.innerHTML = '<div class="empty-state">No hay tareas en esta categoría</div>';
+    return;
+  }
+  
+  categoryTasks.forEach(task => {
+    const taskEl = document.createElement('div');
+    taskEl.className = 'task-item' + (task.completed ? ' task-completed' : '');
+    
+    taskEl.innerHTML = `
+      <div class="task-content">
+        <div class="task-title">${task.title}</div>
+        <div class="task-date">${task.createdAt}</div>
+      </div>
+      <div class="task-actions">
+        <button class="btn-complete" onclick="toggleComplete(${task.id})">
+          ${task.completed ? '↺ Reactivar' : '✓ Completar'}
+        </button>
+        <button class="btn-delete" onclick="deleteTask(${task.id})">
+          🗑 Eliminar
+        </button>
+      </div>
+    `;
+    
+    container.appendChild(taskEl);
+  });
+}
+
+// Marcar tarea como completada/pendiente
+async function toggleComplete(taskId) {
+  const task = tasks.find(t => t.id === taskId);
+  if (task) {
+    task.completed = !task.completed;
+    await saveTasks();
+    renderTasks();
+  }
+}
+
+// Eliminar tarea
+async function deleteTask(taskId) {
+  if (confirm('¿Estás seguro de que querés eliminar esta tarea?')) {
+    tasks = tasks.filter(t => t.id !== taskId);
+    await saveTasks();
+    renderTasks();
+  }
+}
+
+// Actualizar estadísticas
+function updateStats() {
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.completed).length;
+  const pending = total - completed;
+  
+  document.getElementById('totalTasks').textContent = total;
+  document.getElementById('completedTasks').textContent = completed;
+  document.getElementById('pendingTasks').textContent = pending;
+}
+
+// Botón de refrescar
+function refreshTasks() {
+  loadTasks();
+}
+
+// Cargar al iniciar
+loadTheme();
+loadTasks();
+
+</script>
+
+</body>
+</html>
