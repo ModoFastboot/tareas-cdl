@@ -1,0 +1,24 @@
+{
+  "name": "Tareas Cdl - Sergio",
+  "short_name": "Tareas Cdl",
+  "description": "Administrador de tareas con sincronización Google Sheets",
+  "start_url": "/tareas-cdl/task_manager.html",
+  "display": "standalone",
+  "background_color": "#00bcd4",
+  "theme_color": "#00bcd4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

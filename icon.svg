@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#ffffff" rx="80"/>
+  
+  <!-- Cdl Logo Pattern (centered) -->
+  <g transform="translate(128, 128)">
+    <!-- Row 1 -->
+    <rect x="64" y="0" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="128" y="0" width="64" height="64" fill="#7b1fa2" rx="8"/>
+    
+    <!-- Row 2 -->
+    <rect x="0" y="64" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="64" y="64" width="64" height="64" fill="#7b1fa2" rx="8"/>
+    <rect x="128" y="64" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="192" y="64" width="64" height="64" fill="#7b1fa2" rx="8"/>
+    
+    <!-- Row 3 -->
+    <rect x="0" y="128" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="64" y="128" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="128" y="128" width="64" height="64" fill="#7b1fa2" rx="8"/>
+    <rect x="192" y="128" width="64" height="64" fill="#00bcd4" rx="8"/>
+    
+    <!-- Row 4 -->
+    <rect x="64" y="192" width="64" height="64" fill="#00bcd4" rx="8"/>
+    <rect x="128" y="192" width="64" height="64" fill="#00bcd4" rx="8"/>
+  </g>
+</svg>
