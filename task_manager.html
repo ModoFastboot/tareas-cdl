@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administrador de Tareas - Sergio @ Cdl</title>
-
-<!-- PWA Meta Tags -->
 <meta name="theme-color" content="#00bcd4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,17 +13,13 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   transition: background 0.3s ease;
 }
 
@@ -34,22 +28,20 @@ body.dark-mode {
 }
 
 body.dark-mode .header,
-body.dark-mode .input-section,
-body.dark-mode .urgency-category,
+body.dark-mode .tasks-card,
 body.dark-mode .stat-card {
   background: #1e1e1e;
   color: #e0e0e0;
 }
 
 body.dark-mode h1,
-body.dark-mode h2,
 body.dark-mode .task-title,
-body.dark-mode .stat-number {
+body.dark-mode .stat-number,
+body.dark-mode .tasks-title {
   color: #e0e0e0;
 }
 
 body.dark-mode .header p,
-body.dark-mode .form-group label,
 body.dark-mode .task-date,
 body.dark-mode .stat-label {
   color: #b0b0b0;
@@ -64,98 +56,140 @@ body.dark-mode .form-group select {
 
 body.dark-mode .task-item {
   background: #2a2a2a;
+  border-color: #404040;
 }
 
-body.dark-mode .task-item:hover {
-  background: #333333;
-}
+body.dark-mode .task-item:hover { background: #333333; }
+body.dark-mode .empty-state { color: #707070; }
+body.dark-mode .add-form { background: #2a2a2a; border-color: #404040; }
+body.dark-mode .form-group label { color: #b0b0b0; }
+body.dark-mode .reminder-option label { color: #b0b0b0; }
+body.dark-mode #reminderSection, body.dark-mode #calendarSection { background: #1a1a1a; }
+body.dark-mode .divider { border-color: #404040; }
+body.dark-mode .completed-label { color: #707070; }
 
-body.dark-mode .empty-state {
-  color: #707070;
-}
+.container { max-width: 800px; margin: 0 auto; }
 
-.theme-toggle {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: white;
-  border: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  cursor: pointer;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, background 0.3s;
-  z-index: 1000;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-}
-
-.theme-toggle:active {
-  transform: scale(0.95);
-}
-
-body.dark-mode .theme-toggle {
-  background: #2a2a2a;
-}
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
+/* HEADER */
 .header {
   background: white;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-}
-
-.header h1 {
-  font-size: 28px;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
-}
-
-.header p {
-  color: #718096;
-  font-size: 14px;
-}
-
-.input-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-}
-
-.form-group {
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header h1 { font-size: 22px; color: #2d3748; }
+.header p { color: #718096; font-size: 13px; }
+
+.header-actions { display: flex; gap: 0.5rem; }
+
+.btn-header {
+  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.stat-card.active { background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%); }
+.stat-card.active .stat-number, .stat-card.active .stat-label { color: white; }
+.stat-number { font-size: 28px; font-weight: 700; color: #2d3748; }
+.stat-label { font-size: 11px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.2rem; }
+
+/* TASKS CARD */
+.tasks-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tasks-title { font-size: 18px; font-weight: 600; color: #2d3748; }
+
+.btn-add {
+  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-add:hover { transform: translateY(-1px); }
+
+/* ADD FORM */
+.add-form {
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.25rem 1.5rem;
+  display: none;
+}
+
+.add-form.open { display: block; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .form-group label {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #4a5568;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .form-group input, .form-group select {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.6rem 0.75rem;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   transition: border-color 0.2s;
+  background: white;
 }
 
 .form-group input:focus, .form-group select:focus {
@@ -163,393 +197,249 @@ body.dark-mode .theme-toggle {
   border-color: #00bcd4;
 }
 
-.btn {
+.form-full { grid-column: 1 / -1; }
+
+#reminderSection, #calendarSection {
+  display: none;
+  background: #edf2f7;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.reminder-options { display: flex; gap: 1rem; flex-wrap: wrap; }
+.reminder-option { display: flex; align-items: center; gap: 0.4rem; }
+.reminder-option label { font-size: 13px; color: #4a5568; margin: 0; cursor: pointer; }
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox-row label { font-size: 14px; color: #4a5568; cursor: pointer; margin: 0; }
+
+.form-actions { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+
+.btn-submit {
   background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
   color: white;
   border: none;
-  padding: 0.75rem 2rem;
+  padding: 0.6rem 1.5rem;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s;
-  width: 100%;
 }
 
-.btn:hover {
-  transform: translateY(-2px);
+.btn-submit:hover { transform: translateY(-1px); }
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-.btn:active {
-  transform: translateY(0);
-}
+.btn-cancel:hover { background: #cbd5e0; }
 
-.tasks-section {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.urgency-category {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-}
-
-.urgency-category h2 {
-  font-size: 20px;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.urgency-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.urgency-urgent {
-  background: #fee;
-  color: #c53030;
-  border-left: 4px solid #c53030;
-}
-
-.urgency-important {
-  background: #fef5e7;
-  color: #d97706;
-  border-left: 4px solid #d97706;
-}
-
-.urgency-normal {
-  background: #e6f2ff;
-  color: #2b6cb0;
-  border-left: 4px solid #2b6cb0;
-}
-
-.urgency-low {
-  background: #f0f4f8;
-  color: #718096;
-  border-left: 4px solid #718096;
-}
+/* TASK LIST */
+.task-list { padding: 0.75rem 1.5rem; }
 
 .task-item {
   background: #f7fafc;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   transition: all 0.2s;
+  border-left-width: 4px;
 }
 
-.task-item:hover {
-  background: #edf2f7;
-  transform: translateX(4px);
+.task-item:hover { transform: translateX(3px); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+.task-item.urgent   { border-left-color: #c53030; }
+.task-item.important { border-left-color: #d97706; }
+.task-item.normal   { border-left-color: #2b6cb0; }
+.task-item.low      { border-left-color: #718096; }
+
+.task-item.task-completed { opacity: 0.55; }
+.task-item.task-completed .task-title { text-decoration: line-through; }
+
+.task-urgency-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.task-content {
-  flex: 1;
-}
+.dot-urgent   { background: #c53030; }
+.dot-important { background: #d97706; }
+.dot-normal   { background: #2b6cb0; }
+.dot-low      { background: #718096; }
 
-.task-title {
-  font-weight: 500;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
-}
+.task-content { flex: 1; min-width: 0; }
+.task-title { font-weight: 500; color: #2d3748; font-size: 15px; }
+.task-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.2rem; }
+.task-date { font-size: 12px; color: #718096; }
 
-.task-date {
-  font-size: 13px;
-  color: #718096;
-}
-
-.task-reminder-badge {
+.badge {
   display: inline-block;
-  background: #fef5e7;
-  color: #d97706;
-  padding: 0.25rem 0.5rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 4px;
   font-size: 11px;
-  margin-top: 0.25rem;
   font-weight: 500;
 }
 
-.task-calendar-badge {
-  display: inline-block;
-  background: #e6f2ff;
-  color: #2b6cb0;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 11px;
-  margin-top: 0.25rem;
-  margin-left: 0.25rem;
-  font-weight: 500;
-}
+.badge-reminder { background: #fef5e7; color: #d97706; }
+.badge-calendar { background: #e6f2ff; color: #2b6cb0; }
+.badge-urgency  { font-size: 11px; }
 
-.task-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+.task-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
 
 .btn-complete, .btn-delete {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.btn-complete {
-  background: #48bb78;
-  color: white;
+.btn-complete { background: #48bb78; color: white; }
+.btn-complete:hover { background: #38a169; }
+.btn-delete { background: #f56565; color: white; }
+.btn-delete:hover { background: #e53e3e; }
+
+/* DIVIDER between pending and completed */
+.divider {
+  border: none;
+  border-top: 2px dashed #e2e8f0;
+  margin: 0.75rem 0;
 }
 
-.btn-complete:hover {
-  background: #38a169;
-}
-
-.btn-delete {
-  background: #f56565;
-  color: white;
-}
-
-.btn-delete:hover {
-  background: #e53e3e;
-}
-
-.task-completed {
-  opacity: 0.6;
-}
-
-.task-completed .task-title {
-  text-decoration: line-through;
+.completed-label {
+  font-size: 12px;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
 .empty-state {
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem;
   color: #a0aec0;
   font-style: italic;
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: white;
-  padding: 1.25rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-
-.stat-card:active {
-  transform: translateY(-2px);
-}
-
-.stat-card.active {
-  background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%);
-}
-
-.stat-card.active .stat-number,
-.stat-card.active .stat-label {
-  color: white;
-}
-
-.stat-number {
-  font-size: 32px;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-.stat-label {
-  font-size: 13px;
-  color: #718096;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 0.25rem;
-}
-
+/* FILTER BANNER */
 .filter-banner {
-  background: #f7fafc;
+  background: #ebf8ff;
   border: 2px solid #00bcd4;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.filter-banner-text {
-  font-weight: 500;
-  color: #2d3748;
-}
+body.dark-mode .filter-banner { background: #1a2a2a; }
+
+.filter-banner-text { font-size: 14px; font-weight: 500; color: #2d3748; }
+body.dark-mode .filter-banner-text { color: #e0e0e0; }
 
 .filter-clear-btn {
   background: #f56565;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.filter-clear-btn:hover {
-  background: #e53e3e;
-}
-
-body.dark-mode .filter-banner {
-  background: #2a2a2a;
-  border-color: #00bcd4;
-}
-
-body.dark-mode .filter-banner-text {
-  color: #e0e0e0;
-}
-
-.task-item.hidden {
-  display: none;
-}
-
-/* Nuevos estilos para recordatorios y calendario */
-#reminderSection, #calendarSection {
-  display: none;
-  padding: 1rem;
-  background: #f7fafc;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-body.dark-mode #reminderSection,
-body.dark-mode #calendarSection {
-  background: #2a2a2a;
-}
-
-.reminder-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.reminder-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.calendar-fields {
-  display: grid;
-  gap: 1rem;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.checkbox-group:hover {
-  background: #f0f4f8;
-}
-
-body.dark-mode .checkbox-group {
-  background: #1e1e1e;
-}
-
-body.dark-mode .checkbox-group:hover {
-  background: #333;
-}
-
-.calendar-connect-btn {
-  background: #4285f4;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 1rem;
-}
-
-.calendar-connect-btn:hover {
-  background: #3367d6;
-}
-
-.calendar-connected {
-  background: #48bb78;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  color: white;
   font-size: 13px;
-  display: inline-block;
-  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* THEME TOGGLE */
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: white;
+  border: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.3s;
+  z-index: 1000;
+}
+
+.theme-toggle:hover { transform: scale(1.1); }
+body.dark-mode .theme-toggle { background: #2a2a2a; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr; }
+  .calendar-row { grid-template-columns: 1fr 1fr; }
+  .task-item { flex-wrap: wrap; }
+  .task-actions { width: 100%; justify-content: flex-end; margin-top: 0.5rem; }
+  .header h1 { font-size: 18px; }
+  .stats { gap: 0.5rem; }
+  .stat-number { font-size: 22px; }
 }
 </style>
 </head>
 <body>
 
 <div class="container">
+
+  <!-- HEADER -->
   <div class="header">
-    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-      <div style="width: 48px; height: 48px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 2px;">
-        <div style="background: transparent;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #7b1fa2; border-radius: 2px;"></div>
-        <div style="background: transparent;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #7b1fa2; border-radius: 2px;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #7b1fa2; border-radius: 2px;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #7b1fa2; border-radius: 2px;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: transparent;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: #00bcd4; border-radius: 2px;"></div>
-        <div style="background: transparent;"></div>
+    <div class="header-left">
+      <div style="width: 40px; height: 40px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 2px; flex-shrink: 0;">
+        <div style="background:transparent"></div><div style="background:#00bcd4;border-radius:2px"></div><div style="background:#7b1fa2;border-radius:2px"></div><div style="background:transparent"></div>
+        <div style="background:#00bcd4;border-radius:2px"></div><div style="background:#7b1fa2;border-radius:2px"></div><div style="background:#00bcd4;border-radius:2px"></div><div style="background:#7b1fa2;border-radius:2px"></div>
+        <div style="background:#00bcd4;border-radius:2px"></div><div style="background:#00bcd4;border-radius:2px"></div><div style="background:#7b1fa2;border-radius:2px"></div><div style="background:#00bcd4;border-radius:2px"></div>
+        <div style="background:transparent"></div><div style="background:#00bcd4;border-radius:2px"></div><div style="background:#00bcd4;border-radius:2px"></div><div style="background:transparent"></div>
       </div>
-      <h1 style="flex: 1;">Administrador de Tareas</h1>
-      <button onclick="refreshTasks()" style="background: linear-gradient(135deg, #00bcd4 0%, #7b1fa2 100%); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">
-        🔄 Refrescar
-      </button>
+      <div>
+        <h1>Administrador de Tareas</h1>
+        <p>Sergio @ Cdl</p>
+      </div>
     </div>
-    <p>Sergio @ Cdl</p>
-    <div id="calendarStatus"></div>
+    <div class="header-actions">
+      <button class="btn-header" onclick="refreshTasks()">🔄 Refrescar</button>
+    </div>
   </div>
 
-  <div class="stats" id="stats">
-    <div class="stat-card" onclick="filterTasks('all')" id="statAll">
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card active" onclick="filterTasks('all')" id="statAll">
       <div class="stat-number" id="totalTasks">0</div>
-      <div class="stat-label">Total de Tareas</div>
+      <div class="stat-label">Total</div>
     </div>
     <div class="stat-card" onclick="filterTasks('pending')" id="statPending">
       <div class="stat-number" id="pendingTasks">0</div>
@@ -561,114 +451,93 @@ body.dark-mode .checkbox-group:hover {
     </div>
   </div>
 
-  <div id="filterBanner" style="display: none;"></div>
+  <!-- TASKS CARD -->
+  <div class="tasks-card">
 
-  <div class="input-section">
-    <form id="taskForm">
-      <div class="form-group">
-        <label for="taskTitle">Título de la tarea</label>
-        <input type="text" id="taskTitle" placeholder="Ej: Llamar a cliente..." required>
-      </div>
-      
-      <div class="form-group">
-        <label for="taskUrgency">Nivel de urgencia</label>
-        <select id="taskUrgency" required onchange="toggleReminderSection()">
-          <option value="urgent">🔴 Urgente - Requiere atención inmediata</option>
-          <option value="important">🟠 Importante - Prioridad alta</option>
-          <option value="normal" selected>🔵 Normal - Prioridad media</option>
-          <option value="low">⚪ Baja - Puede esperar</option>
-        </select>
-      </div>
+    <!-- Header de la lista -->
+    <div class="tasks-header">
+      <span class="tasks-title">📋 Mis Tareas</span>
+      <button class="btn-add" onclick="toggleForm()">+ Nueva Tarea</button>
+    </div>
 
-      <!-- Recordatorio rápido (solo para urgentes) -->
-      <div id="reminderSection">
-        <label style="font-size: 14px; font-weight: 500; color: #4a5568; margin-bottom: 0.5rem; display: block;">
-          ⏰ Recordarme en:
-        </label>
-        <div class="reminder-options">
-          <div class="reminder-option">
-            <input type="radio" name="reminder" value="0" id="rem0" checked>
-            <label for="rem0">Sin recordatorio</label>
-          </div>
-          <div class="reminder-option">
-            <input type="radio" name="reminder" value="15" id="rem15">
-            <label for="rem15">15 minutos</label>
-          </div>
-          <div class="reminder-option">
-            <input type="radio" name="reminder" value="30" id="rem30">
-            <label for="rem30">30 minutos</label>
-          </div>
-          <div class="reminder-option">
-            <input type="radio" name="reminder" value="60" id="rem60">
-            <label for="rem60">1 hora</label>
-          </div>
-          <div class="reminder-option">
-            <input type="radio" name="reminder" value="120" id="rem120">
-            <label for="rem120">2 horas</label>
+    <!-- Formulario colapsable -->
+    <div class="add-form" id="addForm">
+      <form id="taskForm">
+        <div class="form-row">
+          <div class="form-group form-full">
+            <label for="taskTitle">Título de la tarea</label>
+            <input type="text" id="taskTitle" placeholder="Ej: Llamar a cliente..." required>
           </div>
         </div>
-      </div>
 
-      <!-- Programar en calendario (para todas) -->
-      <div class="form-group" style="margin-top: 1rem;">
-        <div class="checkbox-group" onclick="toggleCalendarSection()">
-          <input type="checkbox" id="enableCalendar">
-          <label for="enableCalendar" style="cursor: pointer; margin: 0;">📅 Programar en Google Calendar</label>
-        </div>
-      </div>
-
-      <div id="calendarSection">
-        <div class="calendar-fields">
-          <div class="form-group" style="margin-bottom: 0.5rem;">
-            <label for="eventDate">Fecha</label>
-            <input type="date" id="eventDate">
-          </div>
-          <div class="form-group" style="margin-bottom: 0.5rem;">
-            <label for="eventTime">Hora</label>
-            <input type="time" id="eventTime">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label for="calendarReminder">Recordatorio de Calendar</label>
-            <select id="calendarReminder">
-              <option value="5">5 minutos antes</option>
-              <option value="15" selected>15 minutos antes</option>
-              <option value="30">30 minutos antes</option>
-              <option value="60">1 hora antes</option>
-              <option value="1440">1 día antes</option>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskUrgency">Urgencia</label>
+            <select id="taskUrgency" required onchange="toggleReminderSection()">
+              <option value="urgent">🔴 Urgente</option>
+              <option value="important">🟠 Importante</option>
+              <option value="normal" selected>🔵 Normal</option>
+              <option value="low">⚪ Baja</option>
             </select>
           </div>
         </div>
-      </div>
 
-      <button type="submit" class="btn" style="margin-top: 1rem;">+ Agregar Tarea</button>
-    </form>
+        <!-- Recordatorio rápido (solo urgentes) -->
+        <div id="reminderSection">
+          <label style="font-size:13px;font-weight:500;color:#4a5568;margin-bottom:0.4rem;display:block;">⏰ Recordarme en:</label>
+          <div class="reminder-options">
+            <div class="reminder-option"><input type="radio" name="reminder" value="0" id="rem0" checked><label for="rem0">Sin recordatorio</label></div>
+            <div class="reminder-option"><input type="radio" name="reminder" value="15" id="rem15"><label for="rem15">15 min</label></div>
+            <div class="reminder-option"><input type="radio" name="reminder" value="30" id="rem30"><label for="rem30">30 min</label></div>
+            <div class="reminder-option"><input type="radio" name="reminder" value="60" id="rem60"><label for="rem60">1 hora</label></div>
+            <div class="reminder-option"><input type="radio" name="reminder" value="120" id="rem120"><label for="rem120">2 horas</label></div>
+          </div>
+        </div>
 
-    <!-- Botón para conectar Google Calendar -->
-    <button id="connectCalendarBtn" class="calendar-connect-btn" onclick="connectGoogleCalendar()" style="display: none;">
-      🔗 Conectar Google Calendar
-    </button>
-  </div>
+        <!-- Programar en Calendar -->
+        <div class="checkbox-row" onclick="toggleCalendarSection()">
+          <input type="checkbox" id="enableCalendar">
+          <label for="enableCalendar">📅 Programar en Google Calendar</label>
+        </div>
 
-  <div class="tasks-section">
-    <div class="urgency-category">
-      <h2><span class="urgency-badge urgency-urgent">🔴 Urgente</span></h2>
-      <div id="urgentTasks" class="task-list"></div>
+        <div id="calendarSection">
+          <div class="calendar-row">
+            <div class="form-group">
+              <label for="eventDate">Fecha</label>
+              <input type="date" id="eventDate">
+            </div>
+            <div class="form-group">
+              <label for="eventTime">Hora</label>
+              <input type="time" id="eventTime">
+            </div>
+            <div class="form-group">
+              <label for="calendarReminder">Recordatorio</label>
+              <select id="calendarReminder">
+                <option value="5">5 min antes</option>
+                <option value="15" selected>15 min antes</option>
+                <option value="30">30 min antes</option>
+                <option value="60">1 hora antes</option>
+                <option value="1440">1 día antes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">+ Agregar</button>
+          <button type="button" class="btn-cancel" onclick="toggleForm()">Cancelar</button>
+        </div>
+      </form>
     </div>
 
-    <div class="urgency-category">
-      <h2><span class="urgency-badge urgency-important">🟠 Importante</span></h2>
-      <div id="importantTasks" class="task-list"></div>
+    <!-- Filter banner -->
+    <div id="filterBanner" style="display:none;"></div>
+
+    <!-- Lista de tareas -->
+    <div class="task-list" id="taskList">
+      <div class="empty-state">Cargando tareas...</div>
     </div>
 
-    <div class="urgency-category">
-      <h2><span class="urgency-badge urgency-normal">🔵 Normal</span></h2>
-      <div id="normalTasks" class="task-list"></div>
-    </div>
-
-    <div class="urgency-category">
-      <h2><span class="urgency-badge urgency-low">⚪ Baja</span></h2>
-      <div id="lowTasks" class="task-list"></div>
-    </div>
   </div>
 </div>
 
@@ -676,404 +545,196 @@ body.dark-mode .checkbox-group:hover {
   <span id="themeIcon">🌙</span>
 </button>
 
-<!-- Google Calendar API -->
 <script src="https://apis.google.com/js/api.js"></script>
 
 <script>
-let tasks = [];
-let isLoading = true;
-let darkMode = false;
-let currentFilter = 'all';
-let notificationPermission = false;
-let calendarConnected = false;
-let activeReminders = []; // Timers activos
-
 // ============================================
-// CONFIGURACIÓN - Pegá acá tu URL del Apps Script
+// CONFIGURACIÓN
 // ============================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyhpWrfIpF3lxDsK-TDVq8USWtx0KEATyhs6TAwekOqT6rD6cX0xI7OMmp4Mu9Gu4SPAQ/exec';
-
-// Google Calendar API Configuration
-// DEJÁ ESTOS COMENTADOS HASTA QUE CONFIGURES GOOGLE CALENDAR
-// Cuando tengas las credenciales, descomentá y pegá tus valores
 const CALENDAR_CLIENT_ID = '155850218957-g5dhhdtkolilrjntmc86dalv8di7vfmr.apps.googleusercontent.com';
 const CALENDAR_API_KEY = 'AIzaSyCrod1HVVmQD8ZzWD0xn2VReuLvTMBbfd0';
 const CALENDAR_DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 const CALENDAR_SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 // ============================================
 
-// Pedir permisos de notificaciones al cargar
-async function requestNotificationPermission() {
-  if ('Notification' in window) {
-    const permission = await Notification.requestPermission();
-    notificationPermission = permission === 'granted';
-    
-    if (notificationPermission) {
-      console.log('Notificaciones habilitadas');
-    } else {
-      console.log('Notificaciones denegadas');
-    }
-  }
-}
+const URGENCY_ORDER = { urgent: 0, important: 1, normal: 2, low: 3 };
+const URGENCY_LABELS = { urgent: '🔴 Urgente', important: '🟠 Importante', normal: '🔵 Normal', low: '⚪ Baja' };
 
-// Mostrar/ocultar sección de recordatorio
-function toggleReminderSection() {
-  const urgency = document.getElementById('taskUrgency').value;
-  const reminderSection = document.getElementById('reminderSection');
-  
-  if (urgency === 'urgent') {
-    reminderSection.style.display = 'block';
-  } else {
-    reminderSection.style.display = 'none';
-    // Reset reminder selection
-    document.getElementById('rem0').checked = true;
-  }
-}
-
-// Mostrar/ocultar sección de calendario
-function toggleCalendarSection() {
-  const checkbox = document.getElementById('enableCalendar');
-  const section = document.getElementById('calendarSection');
-  
-  checkbox.checked = !checkbox.checked;
-  section.style.display = checkbox.checked ? 'block' : 'none';
-  
-  // Mostrar botón de conectar si no está conectado
-  if (checkbox.checked && !calendarConnected) {
-    document.getElementById('connectCalendarBtn').style.display = 'block';
-  }
-}
-
-// Crear recordatorio
-function scheduleReminder(task, minutes) {
-  if (minutes === 0 || !notificationPermission) return;
-  
-  const timeoutId = setTimeout(() => {
-    new Notification('🔴 Tarea Urgente - Tareas Cdl', {
-      body: task.title,
-      icon: 'icon-192.png',
-      badge: 'icon-192.png',
-      tag: `task-${task.id}`,
-      requireInteraction: true
-    });
-  }, minutes * 60 * 1000);
-  
-  activeReminders.push({
-    taskId: task.id,
-    timeoutId: timeoutId
-  });
-  
-  return timeoutId;
-}
-
-// Cancelar recordatorio
-function cancelReminder(taskId) {
-  const reminder = activeReminders.find(r => r.taskId === taskId);
-  if (reminder) {
-    clearTimeout(reminder.timeoutId);
-    activeReminders = activeReminders.filter(r => r.taskId !== taskId);
-  }
-}
+let tasks = [];
+let darkMode = false;
+let currentFilter = 'all';
+let notificationPermission = false;
+let calendarConnected = false;
+let activeReminders = [];
+let formOpen = false;
 
 // ============================================
-// GOOGLE CALENDAR INTEGRATION
+// TEMA
 // ============================================
-
-let tokenClient;
-let gapiInited = false;
-let gisInited = false;
-
-// Inicializar Google API
-function gapiLoaded() {
-  gapi.load('client', initializeGapiClient);
-}
-
-async function initializeGapiClient() {
-  if (!CALENDAR_CLIENT_ID.includes('TU_CLIENT_ID_AQUI')) {
-    await gapi.client.init({
-      apiKey: CALENDAR_API_KEY,
-      discoveryDocs: [CALENDAR_DISCOVERY_DOC],
-    });
-    gapiInited = true;
-    maybeEnableButtons();
-  }
-}
-
-// Inicializar Google Identity Services
-function gisLoaded() {
-  if (!CALENDAR_CLIENT_ID.includes('TU_CLIENT_ID_AQUI')) {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CALENDAR_CLIENT_ID,
-      scope: CALENDAR_SCOPES,
-      callback: '', // definido al momento de solicitar token
-    });
-    gisInited = true;
-    maybeEnableButtons();
-  }
-}
-
-function maybeEnableButtons() {
-  if (gapiInited && gisInited) {
-    document.getElementById('connectCalendarBtn').style.display = 'inline-block';
-  }
-}
-
-// Conectar con Google Calendar
-function connectGoogleCalendar() {
-  tokenClient.callback = async (resp) => {
-    if (resp.error !== undefined) {
-      throw (resp);
-    }
-    calendarConnected = true;
-    document.getElementById('calendarStatus').innerHTML = 
-      '<div class="calendar-connected">✓ Conectado a Google Calendar</div>';
-    document.getElementById('connectCalendarBtn').style.display = 'none';
-  };
-
-  if (gapi.client.getToken() === null) {
-    tokenClient.requestAccessToken({prompt: 'consent'});
-  } else {
-    tokenClient.requestAccessToken({prompt: ''});
-  }
-}
-
-// Crear evento en Google Calendar
-async function createCalendarEvent(task) {
-  if (!calendarConnected || !task.eventDate || !task.eventTime) {
-    return;
-  }
-
-  try {
-    const startDateTime = new Date(`${task.eventDate}T${task.eventTime}`);
-    const endDateTime = new Date(startDateTime.getTime() + (60 * 60 * 1000)); // +1 hora
-
-    const event = {
-      'summary': task.title,
-      'description': `Tarea creada desde Tareas Cdl\nUrgencia: ${task.urgency}`,
-      'start': {
-        'dateTime': startDateTime.toISOString(),
-        'timeZone': 'America/Argentina/Buenos_Aires'
-      },
-      'end': {
-        'dateTime': endDateTime.toISOString(),
-        'timeZone': 'America/Argentina/Buenos_Aires'
-      },
-      'reminders': {
-        'useDefault': false,
-        'overrides': [
-          {'method': 'popup', 'minutes': task.calendarReminder || 15}
-        ]
-      }
-    };
-
-    const request = await gapi.client.calendar.events.insert({
-      'calendarId': 'primary',
-      'resource': event
-    });
-
-    task.calendarEventId = request.result.id;
-    console.log('Evento creado en Calendar:', request.result.htmlLink);
-    
-  } catch (error) {
-    console.error('Error al crear evento en Calendar:', error);
-  }
-}
-
-// Función para filtrar tareas
-function filterTasks(filter) {
-  currentFilter = filter;
-  
-  document.getElementById('statAll').classList.remove('active');
-  document.getElementById('statPending').classList.remove('active');
-  document.getElementById('statCompleted').classList.remove('active');
-  
-  const filterBanner = document.getElementById('filterBanner');
-  
-  if (filter === 'all') {
-    filterBanner.style.display = 'none';
-    document.querySelectorAll('.task-item').forEach(item => {
-      item.classList.remove('hidden');
-    });
-    document.getElementById('statAll').classList.add('active');
-    document.querySelector('.tasks-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-  } else if (filter === 'pending') {
-    document.getElementById('statPending').classList.add('active');
-    filterBanner.style.display = 'block';
-    filterBanner.className = 'filter-banner';
-    filterBanner.innerHTML = `
-      <span class="filter-banner-text">📋 Mostrando solo tareas pendientes</span>
-      <button class="filter-clear-btn" onclick="filterTasks('all')">✕ Ver todas</button>
-    `;
-    
-    document.querySelectorAll('.task-item').forEach(item => {
-      if (item.classList.contains('task-completed')) {
-        item.classList.add('hidden');
-      } else {
-        item.classList.remove('hidden');
-      }
-    });
-    
-    filterBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-  } else if (filter === 'completed') {
-    document.getElementById('statCompleted').classList.add('active');
-    filterBanner.style.display = 'block';
-    filterBanner.className = 'filter-banner';
-    filterBanner.innerHTML = `
-      <span class="filter-banner-text">✅ Mostrando solo tareas completadas</span>
-      <button class="filter-clear-btn" onclick="filterTasks('all')">✕ Ver todas</button>
-    `;
-    
-    document.querySelectorAll('.task-item').forEach(item => {
-      if (item.classList.contains('task-completed')) {
-        item.classList.remove('hidden');
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-    
-    filterBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-// Cargar tema desde localStorage
 function loadTheme() {
   const saved = localStorage.getItem('cdl_theme_sergio');
-  if (saved) {
-    darkMode = JSON.parse(saved);
-    applyTheme();
-  }
+  if (saved) { darkMode = JSON.parse(saved); applyTheme(); }
 }
 
-// Guardar tema
-function saveTheme() {
-  localStorage.setItem('cdl_theme_sergio', JSON.stringify(darkMode));
-}
+function saveTheme() { localStorage.setItem('cdl_theme_sergio', JSON.stringify(darkMode)); }
 
-// Aplicar tema
 function applyTheme() {
-  const themeIcon = document.getElementById('themeIcon');
-  if (darkMode) {
-    document.body.classList.add('dark-mode');
-    themeIcon.textContent = '☀️';
-  } else {
-    document.body.classList.remove('dark-mode');
-    themeIcon.textContent = '🌙';
-  }
+  const icon = document.getElementById('themeIcon');
+  if (darkMode) { document.body.classList.add('dark-mode'); icon.textContent = '☀️'; }
+  else { document.body.classList.remove('dark-mode'); icon.textContent = '🌙'; }
 }
 
-// Toggle tema
 document.getElementById('themeToggle').addEventListener('click', function() {
-  darkMode = !darkMode;
-  applyTheme();
-  saveTheme();
+  darkMode = !darkMode; applyTheme(); saveTheme();
 });
 
-// Cargar tareas desde Google Sheets
-async function loadTasks() {
-  if (!SCRIPT_URL || SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
-    alert('Por favor configurá la URL del Apps Script en el código');
-    return;
+// ============================================
+// FORMULARIO
+// ============================================
+function toggleForm() {
+  formOpen = !formOpen;
+  document.getElementById('addForm').classList.toggle('open', formOpen);
+  if (formOpen) document.getElementById('taskTitle').focus();
+}
+
+function toggleReminderSection() {
+  const urgency = document.getElementById('taskUrgency').value;
+  const section = document.getElementById('reminderSection');
+  section.style.display = urgency === 'urgent' ? 'block' : 'none';
+  if (urgency !== 'urgent') document.getElementById('rem0').checked = true;
+}
+
+function toggleCalendarSection() {
+  const cb = document.getElementById('enableCalendar');
+  cb.checked = !cb.checked;
+  document.getElementById('calendarSection').style.display = cb.checked ? 'block' : 'none';
+}
+
+// ============================================
+// NOTIFICACIONES
+// ============================================
+async function requestNotificationPermission() {
+  if ('Notification' in window) {
+    const p = await Notification.requestPermission();
+    notificationPermission = p === 'granted';
   }
-  
+}
+
+function scheduleReminder(task, minutes) {
+  if (minutes === 0 || !notificationPermission) return;
+  const timeoutId = setTimeout(() => {
+    new Notification('🔴 Tarea Urgente - Tareas Cdl', {
+      body: task.title, icon: 'icon-192.png', tag: `task-${task.id}`, requireInteraction: true
+    });
+  }, minutes * 60 * 1000);
+  activeReminders.push({ taskId: task.id, timeoutId });
+}
+
+function cancelReminder(taskId) {
+  const r = activeReminders.find(r => r.taskId === taskId);
+  if (r) { clearTimeout(r.timeoutId); activeReminders = activeReminders.filter(r => r.taskId !== taskId); }
+}
+
+// ============================================
+// GOOGLE CALENDAR
+// ============================================
+let tokenClient, gapiInited = false, gisInited = false;
+
+function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+
+async function initializeGapiClient() {
+  try {
+    await gapi.client.init({ apiKey: CALENDAR_API_KEY, discoveryDocs: [CALENDAR_DISCOVERY_DOC] });
+    gapiInited = true;
+  } catch(e) { console.log('Calendar API init error:', e); }
+}
+
+async function createCalendarEvent(task) {
+  if (!calendarConnected || !task.eventDate || !task.eventTime) return;
+  try {
+    const start = new Date(`${task.eventDate}T${task.eventTime}`);
+    const end = new Date(start.getTime() + 3600000);
+    const event = {
+      summary: task.title,
+      description: `Tarea Cdl - Urgencia: ${URGENCY_LABELS[task.urgency]}`,
+      start: { dateTime: start.toISOString(), timeZone: 'America/Argentina/Buenos_Aires' },
+      end: { dateTime: end.toISOString(), timeZone: 'America/Argentina/Buenos_Aires' },
+      reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: task.calendarReminder || 15 }] }
+    };
+    const req = await gapi.client.calendar.events.insert({ calendarId: 'primary', resource: event });
+    task.calendarEventId = req.result.id;
+  } catch(e) { console.error('Error Calendar:', e); }
+}
+
+// ============================================
+// GOOGLE SHEETS
+// ============================================
+async function loadTasks() {
   try {
     const response = await fetch(SCRIPT_URL + '?action=get');
     const data = await response.json();
-    
     if (data.status === 'success') {
       tasks = data.tasks || [];
-      
-      // Reactivar recordatorios pendientes
       tasks.forEach(task => {
         if (task.reminderMinutes && !task.completed) {
-          const createdTime = new Date(task.createdAt).getTime();
-          const now = new Date().getTime();
-          const elapsed = Math.floor((now - createdTime) / (60 * 1000));
+          const elapsed = Math.floor((Date.now() - new Date(task.createdAt).getTime()) / 60000);
           const remaining = task.reminderMinutes - elapsed;
-          
-          if (remaining > 0) {
-            scheduleReminder(task, remaining);
-          }
+          if (remaining > 0) scheduleReminder(task, remaining);
         }
       });
     }
-  } catch (error) {
-    console.error('Error al cargar tareas:', error);
+  } catch(e) {
+    console.error('Error cargando tareas:', e);
     alert('Error al conectar con Google Sheets. Verificá tu conexión.');
   }
-  
-  isLoading = false;
   renderTasks();
 }
 
-// Guardar tareas en Google Sheets
 async function saveTasks() {
-  if (!SCRIPT_URL || SCRIPT_URL === 'TU_URL_DE_APPS_SCRIPT_AQUI') {
-    return;
-  }
-  
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'save', tasks: tasks })
+      body: JSON.stringify({ action: 'save', tasks })
     });
-    
     const data = await response.json();
-    
-    if (data.status !== 'success') {
-      throw new Error('Error al guardar');
-    }
-  } catch (error) {
-    console.error('Error al guardar tareas:', error);
-    alert('Hubo un problema al guardar la tarea. Por favor intentá de nuevo.');
+    if (data.status !== 'success') throw new Error('Error al guardar');
+  } catch(e) {
+    console.error('Error guardando:', e);
+    alert('Hubo un problema al guardar. Intentá de nuevo.');
   }
 }
 
-// Agregar nueva tarea
+function refreshTasks() { loadTasks(); }
+
+// ============================================
+// AGREGAR TAREA
+// ============================================
 document.getElementById('taskForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  
-  const title = document.getElementById('taskTitle').value;
+
+  const title = document.getElementById('taskTitle').value.trim();
   const urgency = document.getElementById('taskUrgency').value;
-  const reminderMinutes = urgency === 'urgent' ? 
+  const reminderMinutes = urgency === 'urgent' ?
     parseInt(document.querySelector('input[name="reminder"]:checked').value) : 0;
-  
-  // Datos de calendario
   const enableCalendar = document.getElementById('enableCalendar').checked;
   const eventDate = enableCalendar ? document.getElementById('eventDate').value : null;
   const eventTime = enableCalendar ? document.getElementById('eventTime').value : null;
-  const calendarReminder = enableCalendar ? 
-    parseInt(document.getElementById('calendarReminder').value) : 15;
-  
+  const calendarReminder = enableCalendar ? parseInt(document.getElementById('calendarReminder').value) : 15;
+
   const task = {
-    id: Date.now(),
-    title: title,
-    urgency: urgency,
-    completed: false,
-    createdAt: new Date().toISOString(),
-    reminderMinutes: reminderMinutes,
-    eventDate: eventDate,
-    eventTime: eventTime,
-    calendarReminder: calendarReminder,
-    calendarEventId: null
+    id: Date.now(), title, urgency,
+    completed: false, createdAt: new Date().toISOString(),
+    reminderMinutes, eventDate, eventTime, calendarReminder, calendarEventId: null
   };
-  
+
   tasks.push(task);
-  
-  // Programar recordatorio si aplica
-  if (reminderMinutes > 0) {
-    scheduleReminder(task, reminderMinutes);
-  }
-  
-  // Crear evento en Calendar si aplica
-  if (enableCalendar && eventDate && eventTime) {
-    await createCalendarEvent(task);
-  }
-  
+  if (reminderMinutes > 0) scheduleReminder(task, reminderMinutes);
+  if (enableCalendar && eventDate && eventTime) await createCalendarEvent(task);
+
   await saveTasks();
   renderTasks();
-  
+
   // Limpiar formulario
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskUrgency').value = 'normal';
@@ -1083,98 +744,27 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
   document.getElementById('eventTime').value = '';
   document.getElementById('reminderSection').style.display = 'none';
   document.getElementById('calendarSection').style.display = 'none';
+
+  // Cerrar formulario
+  formOpen = false;
+  document.getElementById('addForm').classList.remove('open');
 });
 
-// Renderizar todas las tareas
-function renderTasks() {
-  document.getElementById('urgentTasks').innerHTML = '';
-  document.getElementById('importantTasks').innerHTML = '';
-  document.getElementById('normalTasks').innerHTML = '';
-  document.getElementById('lowTasks').innerHTML = '';
-  
-  const urgent = tasks.filter(t => t.urgency === 'urgent');
-  const important = tasks.filter(t => t.urgency === 'important');
-  const normal = tasks.filter(t => t.urgency === 'normal');
-  const low = tasks.filter(t => t.urgency === 'low');
-  
-  renderCategory('urgentTasks', urgent);
-  renderCategory('importantTasks', important);
-  renderCategory('normalTasks', normal);
-  renderCategory('lowTasks', low);
-  
-  updateStats();
-  
-  if (currentFilter !== 'all') {
-    filterTasks(currentFilter);
-  }
-}
-
-// Renderizar una categoría específica
-function renderCategory(containerId, categoryTasks) {
-  const container = document.getElementById(containerId);
-  
-  if (categoryTasks.length === 0) {
-    container.innerHTML = '<div class="empty-state">No hay tareas en esta categoría</div>';
-    return;
-  }
-  
-  categoryTasks.forEach(task => {
-    const taskEl = document.createElement('div');
-    taskEl.className = 'task-item' + (task.completed ? ' task-completed' : '');
-    
-    let badges = '';
-    if (task.reminderMinutes && task.reminderMinutes > 0 && !task.completed) {
-      badges += `<span class="task-reminder-badge">⏰ Recordatorio en ${task.reminderMinutes} min</span>`;
-    }
-    if (task.eventDate && task.eventTime) {
-      const eventDateTime = new Date(`${task.eventDate}T${task.eventTime}`);
-      badges += `<span class="task-calendar-badge">📅 ${eventDateTime.toLocaleString('es-AR', {
-        day: '2-digit',
-        month: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</span>`;
-    }
-    
-    taskEl.innerHTML = `
-      <div class="task-content">
-        <div class="task-title">${task.title}</div>
-        <div class="task-date">${new Date(task.createdAt).toLocaleString('es-AR')}</div>
-        ${badges}
-      </div>
-      <div class="task-actions">
-        <button class="btn-complete" onclick="toggleComplete(${task.id})">
-          ${task.completed ? '↺ Reactivar' : '✓ Completar'}
-        </button>
-        <button class="btn-delete" onclick="deleteTask(${task.id})">
-          🗑 Eliminar
-        </button>
-      </div>
-    `;
-    
-    container.appendChild(taskEl);
-  });
-}
-
-// Marcar tarea como completada/pendiente
+// ============================================
+// COMPLETAR / ELIMINAR
+// ============================================
 async function toggleComplete(taskId) {
   const task = tasks.find(t => t.id === taskId);
   if (task) {
     task.completed = !task.completed;
-    
-    // Cancelar recordatorio si se completa
-    if (task.completed) {
-      cancelReminder(taskId);
-    }
-    
+    if (task.completed) cancelReminder(taskId);
     await saveTasks();
     renderTasks();
   }
 }
 
-// Eliminar tarea
 async function deleteTask(taskId) {
-  if (confirm('¿Estás seguro de que querés eliminar esta tarea?')) {
+  if (confirm('¿Eliminar esta tarea?')) {
     cancelReminder(taskId);
     tasks = tasks.filter(t => t.id !== taskId);
     await saveTasks();
@@ -1182,35 +772,128 @@ async function deleteTask(taskId) {
   }
 }
 
-// Actualizar estadísticas
+// ============================================
+// FILTROS
+// ============================================
+function filterTasks(filter) {
+  currentFilter = filter;
+  ['statAll','statPending','statCompleted'].forEach(id => document.getElementById(id).classList.remove('active'));
+  document.getElementById('filter' in { all:'statAll', pending:'statPending', completed:'statCompleted' } ? '' : '');
+
+  const bannerMap = {
+    all: null,
+    pending: '📋 Mostrando solo tareas pendientes',
+    completed: '✅ Mostrando solo tareas completadas'
+  };
+
+  const statMap = { all: 'statAll', pending: 'statPending', completed: 'statCompleted' };
+  document.getElementById(statMap[filter]).classList.add('active');
+
+  const filterBanner = document.getElementById('filterBanner');
+  if (filter === 'all') {
+    filterBanner.style.display = 'none';
+  } else {
+    filterBanner.style.display = 'flex';
+    filterBanner.className = 'filter-banner';
+    filterBanner.innerHTML = `
+      <span class="filter-banner-text">${bannerMap[filter]}</span>
+      <button class="filter-clear-btn" onclick="filterTasks('all')">✕ Ver todas</button>
+    `;
+  }
+
+  renderTasks();
+}
+
+// ============================================
+// RENDER
+// ============================================
+function renderTasks() {
+  updateStats();
+  const container = document.getElementById('taskList');
+
+  let visibleTasks = tasks;
+  if (currentFilter === 'pending') visibleTasks = tasks.filter(t => !t.completed);
+  if (currentFilter === 'completed') visibleTasks = tasks.filter(t => t.completed);
+
+  // Ordenar: pendientes por urgencia, luego completadas por urgencia
+  const pending = visibleTasks
+    .filter(t => !t.completed)
+    .sort((a, b) => URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency]);
+
+  const completed = visibleTasks
+    .filter(t => t.completed)
+    .sort((a, b) => URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency]);
+
+  if (visibleTasks.length === 0) {
+    container.innerHTML = '<div class="empty-state">No hay tareas para mostrar</div>';
+    return;
+  }
+
+  let html = '';
+
+  // Tareas pendientes
+  pending.forEach(task => { html += renderTaskHTML(task); });
+
+  // Divisor y completadas
+  if (completed.length > 0) {
+    if (pending.length > 0) {
+      html += `<hr class="divider"><div class="completed-label">✅ Completadas</div>`;
+    }
+    completed.forEach(task => { html += renderTaskHTML(task); });
+  }
+
+  container.innerHTML = html;
+}
+
+function renderTaskHTML(task) {
+  const dotClass = `dot-${task.urgency}`;
+
+  let badges = '';
+  if (task.reminderMinutes && task.reminderMinutes > 0 && !task.completed) {
+    badges += `<span class="badge badge-reminder">⏰ ${task.reminderMinutes} min</span>`;
+  }
+  if (task.eventDate && task.eventTime) {
+    const dt = new Date(`${task.eventDate}T${task.eventTime}`);
+    badges += `<span class="badge badge-calendar">📅 ${dt.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>`;
+  }
+
+  return `
+    <div class="task-item ${task.urgency}${task.completed ? ' task-completed' : ''}">
+      <div class="task-urgency-dot ${dotClass}"></div>
+      <div class="task-content">
+        <div class="task-title">${task.title}</div>
+        <div class="task-meta">
+          <span class="task-date">${new Date(task.createdAt).toLocaleString('es-AR')}</span>
+          <span class="badge" style="background:transparent;color:#a0aec0;font-size:11px;">${URGENCY_LABELS[task.urgency]}</span>
+          ${badges}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="btn-complete" onclick="toggleComplete(${task.id})">
+          ${task.completed ? '↺ Reactivar' : '✓ Completar'}
+        </button>
+        <button class="btn-delete" onclick="deleteTask(${task.id})">🗑</button>
+      </div>
+    </div>
+  `;
+}
+
 function updateStats() {
   const total = tasks.length;
   const completed = tasks.filter(t => t.completed).length;
-  const pending = total - completed;
-  
   document.getElementById('totalTasks').textContent = total;
+  document.getElementById('pendingTasks').textContent = total - completed;
   document.getElementById('completedTasks').textContent = completed;
-  document.getElementById('pendingTasks').textContent = pending;
 }
 
-// Botón de refrescar
-function refreshTasks() {
-  loadTasks();
-}
-
-// Cargar al iniciar
+// ============================================
+// INIT
+// ============================================
 loadTheme();
 requestNotificationPermission();
 loadTasks();
 
-// Cargar Google APIs
-if (typeof gapi !== 'undefined') {
-  gapiLoaded();
-}
-if (typeof google !== 'undefined') {
-  gisLoaded();
-}
-
+if (typeof gapi !== 'undefined') gapiLoaded();
 </script>
 
 </body>
