@@ -67,6 +67,73 @@ body.dark-mode .reminder-option label { color: #b0b0b0; }
 body.dark-mode #reminderSection, body.dark-mode #calendarSection { background: #1a1a1a; }
 body.dark-mode .divider { border-color: #404040; }
 body.dark-mode .completed-label { color: #707070; }
+body.dark-mode .task-notes { color: #909090; }
+body.dark-mode .modal-content { background: #1e1e1e; }
+body.dark-mode .modal-content h3 { color: #e0e0e0; }
+body.dark-mode .modal-content .form-group input,
+body.dark-mode .modal-content .form-group select,
+body.dark-mode .modal-content .form-group textarea { background: #2a2a2a; border-color: #404040; color: #e0e0e0; }
+body.dark-mode .modal-content .form-group label { color: #b0b0b0; }
+
+/* MODAL EDITAR */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-content h3 { font-size: 18px; color: #2d3748; margin-bottom: 1rem; }
+.modal-content textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+.modal-content textarea:focus { outline: none; border-color: #00bcd4; }
+.modal-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+/* NOTAS EN TAREA */
+.task-notes {
+  font-size: 13px;
+  color: #718096;
+  margin-top: 0.3rem;
+  font-style: italic;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.btn-edit {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: #e2e8f0;
+  color: #4a5568;
+  white-space: nowrap;
+}
+.btn-edit:hover { background: #cbd5e0; }
 
 .container { max-width: 800px; margin: 0 auto; }
 
@@ -523,6 +590,13 @@ body.dark-mode .theme-toggle { background: #2a2a2a; }
           </div>
         </div>
 
+        <div class="form-row" style="margin-top:0.75rem;">
+          <div class="form-group form-full">
+            <label for="taskNotes">📝 Notas / Detalle (opcional)</label>
+            <textarea id="taskNotes" placeholder="Ej: Esperando modificación del sistema..." style="width:100%;padding:0.6rem 0.75rem;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:60px;"></textarea>
+          </div>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn-submit">+ Agregar</button>
           <button type="button" class="btn-cancel" onclick="toggleForm()">Cancelar</button>
@@ -538,6 +612,34 @@ body.dark-mode .theme-toggle { background: #2a2a2a; }
       <div class="empty-state">Cargando tareas...</div>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-content">
+    <h3>✏️ Editar Tarea</h3>
+    <div class="form-group" style="margin-bottom:0.75rem;">
+      <label for="editTitle">Título</label>
+      <input type="text" id="editTitle">
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem;">
+      <label for="editUrgency">Urgencia</label>
+      <select id="editUrgency">
+        <option value="urgent">🔴 Urgente</option>
+        <option value="important">🟠 Importante</option>
+        <option value="normal">🔵 Normal</option>
+        <option value="low">⚪ Baja</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="editNotes">📝 Notas / Detalle</label>
+      <textarea id="editNotes" placeholder="Agregá un detalle o actualización..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-submit" onclick="saveEdit()">💾 Guardar</button>
+      <button class="btn-cancel" onclick="closeEdit()">Cancelar</button>
+    </div>
   </div>
 </div>
 
@@ -725,6 +827,7 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
   const task = {
     id: Date.now(), title, urgency,
     completed: false, createdAt: new Date().toISOString(),
+    notes: document.getElementById('taskNotes').value.trim(),
     reminderMinutes, eventDate, eventTime, calendarReminder, calendarEventId: null
   };
 
@@ -737,6 +840,7 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
 
   // Limpiar formulario
   document.getElementById('taskTitle').value = '';
+  document.getElementById('taskNotes').value = '';
   document.getElementById('taskUrgency').value = 'normal';
   document.getElementById('rem0').checked = true;
   document.getElementById('enableCalendar').checked = false;
@@ -771,6 +875,42 @@ async function deleteTask(taskId) {
     renderTasks();
   }
 }
+
+// ============================================
+// EDITAR TAREA
+// ============================================
+let editingTaskId = null;
+
+function openEdit(taskId) {
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return;
+  editingTaskId = taskId;
+  document.getElementById('editTitle').value = task.title;
+  document.getElementById('editUrgency').value = task.urgency;
+  document.getElementById('editNotes').value = task.notes || '';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEdit() {
+  editingTaskId = null;
+  document.getElementById('editModal').classList.remove('open');
+}
+
+async function saveEdit() {
+  const task = tasks.find(t => t.id === editingTaskId);
+  if (!task) return;
+  task.title = document.getElementById('editTitle').value.trim();
+  task.urgency = document.getElementById('editUrgency').value;
+  task.notes = document.getElementById('editNotes').value.trim();
+  closeEdit();
+  await saveTasks();
+  renderTasks();
+}
+
+// Cerrar modal clickeando afuera
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEdit();
+});
 
 // ============================================
 // FILTROS
@@ -862,6 +1002,7 @@ function renderTaskHTML(task) {
       <div class="task-urgency-dot ${dotClass}"></div>
       <div class="task-content">
         <div class="task-title">${task.title}</div>
+        ${task.notes ? `<div class="task-notes">📝 ${task.notes}</div>` : ''}
         <div class="task-meta">
           <span class="task-date">${new Date(task.createdAt).toLocaleString('es-AR')}</span>
           <span class="badge" style="background:transparent;color:#a0aec0;font-size:11px;">${URGENCY_LABELS[task.urgency]}</span>
@@ -869,6 +1010,7 @@ function renderTaskHTML(task) {
         </div>
       </div>
       <div class="task-actions">
+        <button class="btn-edit" onclick="openEdit(${task.id})">✏️</button>
         <button class="btn-complete" onclick="toggleComplete(${task.id})">
           ${task.completed ? '↺ Reactivar' : '✓ Completar'}
         </button>
