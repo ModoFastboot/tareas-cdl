@@ -1,5 +1,5 @@
 {
-  "name": "Tareas Cdl - Sergio",
+  "name": "Tareas Cdl",
   "short_name": "Tareas Cdl",
   "description": "Administrador de tareas con sincronización Google Sheets",
   "start_url": "/tareas-cdl/task_manager.html",
